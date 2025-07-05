@@ -1,11 +1,45 @@
 import { useState, useEffect } from 'react';
-import { Card, Row, Col, Container, Pagination, Form, Button } from 'react-bootstrap';
+import { Card, Row, Col, Container, Pagination, Form, Button, Alert, Table } from 'react-bootstrap';
 import FilterSearch from './FilterSearch';
 import { Link } from 'react-router-dom';
 import { FaArrowUp, FaArrowDown, FaStar, FaRegStar } from 'react-icons/fa';
 import ScrollToTop from './ScrollToTop';
 import { useMediaQuery } from 'react-responsive';
 import carDataJson from '/src/data/cars.json'; // Adjust the path according to your project structure
+
+// --- Admin Calculation Helpers ---
+const getInventoryValue = (cars) => {
+  return cars.reduce((sum, car) => {
+    const price = car.Prc ? parseFloat(car.Prc.replace(/,/g, '')) : 0;
+    return !isNaN(price) && price > 0 ? sum + price : sum;
+  }, 0);
+};
+
+const getTransactions = () => {
+  const tx = localStorage.getItem('transactions');
+  return tx ? JSON.parse(tx) : [];
+};
+
+const addMockTransaction = (amount = 100000, carName = 'Demo Car') => {
+  const tx = getTransactions();
+  tx.push({
+    type: 'booking',
+    amount,
+    date: new Date().toISOString(),
+    carName
+  });
+  localStorage.setItem('transactions', JSON.stringify(tx));
+};
+
+const getTotalRevenue = () => {
+  const tx = getTransactions();
+  return tx.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+};
+
+const clearAllTransactions = () => {
+  localStorage.removeItem('transactions');
+};
+// --- End Admin Helpers ---
 
 const Dashboard = () => {
     const [carData, setCarData] = useState([]);
@@ -15,6 +49,10 @@ const Dashboard = () => {
     const [sortDirection, setSortDirection] = useState('asc');
     const [visibleItems, setVisibleItems] = useState(30); // State for Load More
     const itemsPerPage = 21;
+    const [inventoryValue, setInventoryValue] = useState(0);
+    const [totalRevenue, setTotalRevenue] = useState(0);
+    const [showAlert, setShowAlert] = useState(false);
+    const [transactions, setTransactions] = useState([]);
 
     // Determine if the device is mobile
     const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -27,7 +65,25 @@ const Dashboard = () => {
         }));
         setCarData(carsWithHighlight);
         setFilteredData(carsWithHighlight);
+        setInventoryValue(getInventoryValue(data.Cars));
+        setTotalRevenue(getTotalRevenue());
+        setTransactions(getTransactions());
     }, []);
+
+    // For demo: update revenue after adding a transaction
+    const handleAddMockTransaction = () => {
+      addMockTransaction(150000, 'Demo Car');
+      setTotalRevenue(getTotalRevenue());
+      setTransactions(getTransactions());
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 2000);
+    };
+
+    const handleClearTransactions = () => {
+      clearAllTransactions();
+      setTotalRevenue(0);
+      setTransactions([]);
+    };
 
     const handleFilter = (query) => {
         const normalizedQuery = query.replace(/,/g, '').toLowerCase();
@@ -107,6 +163,78 @@ const Dashboard = () => {
     return (
         <>
             <Container style={{ marginTop: '130px' }}>
+                {/* Admin Calculations Section - always show at top */}
+                <Row className="mb-4">
+                  <Col md={6}>
+                    <Card className="shadow-sm p-3 mb-2 bg-white rounded">
+                      <Card.Body>
+                        <Card.Title>Total Inventory Value</Card.Title>
+                        <Card.Text style={{ fontSize: '1.5rem', color: '#1e2a38' }}>
+                          {isNaN(inventoryValue) ? '0' : inventoryValue.toLocaleString()} THB
+                        </Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                  <Col md={6}>
+                    <Card className="shadow-sm p-3 mb-2 bg-white rounded">
+                      <Card.Body>
+                        <Card.Title>Total Revenue</Card.Title>
+                        <Card.Text style={{ fontSize: '1.5rem', color: '#28a745' }}>
+                          {isNaN(totalRevenue) ? '0' : totalRevenue.toLocaleString()} THB
+                        </Card.Text>
+                        <Button variant="outline-success" size="sm" onClick={handleAddMockTransaction}>
+                          Add Demo Transaction
+                        </Button>{' '}
+                        <Button variant="outline-danger" size="sm" onClick={handleClearTransactions}>
+                          Clear All Transactions
+                        </Button>
+                        {showAlert && <Alert variant="success" className="mt-2 py-1">Demo transaction added!</Alert>}
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+                {/* End Admin Calculations Section */}
+
+                {/* Transaction Table */}
+                <Row className="mb-4">
+                  <Col md={12}>
+                    <Card className="shadow-sm p-3 mb-2 bg-white rounded">
+                      <Card.Body>
+                        <Card.Title>Transaction History</Card.Title>
+                        {transactions.length === 0 ? (
+                          <div className="text-muted">No transactions yet.</div>
+                        ) : (
+                          <Table striped bordered hover responsive size="sm" className="mt-3">
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Type</th>
+                                <th>Car</th>
+                                <th>Model</th>
+                                <th>Amount (THB)</th>
+                                <th>Date</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {transactions.map((tx, idx) => (
+                                <tr key={idx}>
+                                  <td>{idx + 1}</td>
+                                  <td>{tx.type}</td>
+                                  <td>{tx.carName}</td>
+                                  <td>{tx.carModel}</td>
+                                  <td>{parseFloat(tx.amount).toLocaleString()}</td>
+                                  <td>{new Date(tx.date).toLocaleString()}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </Table>
+                        )}
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+                {/* End Transaction Table */}
+
                 <h2 className="text-center" style={{ color: '#023047', fontWeight: 'bold' }}>Car Analytics Dashboard</h2>
                 <div className="d-flex justify-content-center my-4">
                     <FilterSearch onFilter={handleFilter} />

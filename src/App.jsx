@@ -7,6 +7,7 @@ import ContactPage from './components/ContactPage';
 import Footer from './components/Footer';
 import HighlightedCars from './components/HighlightedCarsPage'; // Import the component
 import StatisticsPage from './components/StatisticsPage'
+import SmartCarLoanAdvisor from './components/SmartCarLoanAdvisor';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/highlighted-cars" element={<HighlightedCars />} />
         <Route path="/statistics" element={<StatisticsPage />} />
+        <Route path="/loan-advisor" element={<SmartCarLoanAdvisor />} />
       </Routes>
       <Footer />
     </Router>

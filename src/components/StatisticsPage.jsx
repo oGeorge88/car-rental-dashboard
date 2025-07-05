@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Table, Row, Col } from 'react-bootstrap';
 import { Pie, Bar } from 'react-chartjs-2';
 import 'chart.js/auto'; // Import Chart.js components

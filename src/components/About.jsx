@@ -23,7 +23,7 @@ const About = () => {
                 className="mt-4"
                 style={{ fontSize: "1.1rem", lineHeight: "1.6", color: "#555" }}
               >
-                Welcome to the Car Analytics application! Our goal is to offer a
+                Welcome to the Car Analytics and Slaes application! Our goal is to offer a
                 user-friendly experience for car enthusiasts.
               </Card.Text>
               <Card.Text

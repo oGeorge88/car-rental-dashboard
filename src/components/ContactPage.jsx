@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import georgeImage from '/src/assets/George.png';
-import laWeeChanImage from '/src/assets/LaWeeChan.png';
-import zaiImage from '/src/assets/Zai.png';
+import placeholderImage from '/src/assets/placeholder.png'; // Use a generic team member image
 
 const owners = [
     {
@@ -13,18 +12,32 @@ const owners = [
         phone: '0632100659',
     },
     {
-        name: 'Min La Wee Chan  ',
-        id: '6520189',
-        email: 'u6520189@au.edu ',
-        image: laWeeChanImage,
-        phone: '0649916003',
+        name: 'Marazal Bahrainee Islam',
+        id: '6720051',
+        email: 'u6720051@au.edu',
+        image: placeholderImage,
+        phone: '',
     },
     {
-        name: 'Sai Hein Thu Ya Soe',
-        id: '6520051',
-        email: 'u6520051@au.edu',
-        image: zaiImage,
-        phone: '0661078960',
+        name: 'Chhialy Klo',
+        id: '6520159',
+        email: 'u6520159@au.edu',
+        image: placeholderImage,
+        phone: '',
+    },
+    {
+        name: 'Meassavrin Savuth',
+        id: '6520177',
+        email: 'u6520177@au.edu',
+        image: placeholderImage,
+        phone: '',
+    },
+    {
+        name: 'Vireak La',
+        id: '6540235',
+        email: 'u6540235@au.edu',
+        image: placeholderImage,
+        phone: '',
     },
 ];
 
@@ -73,14 +86,24 @@ const ContactPage = () => {
             <Row className="mt-5">
                 {owners.map((owner, index) => (
                     <Col md={4} key={index} className="mb-4">
-                        <Card className="text-center">
-                            <Card.Img variant="top" src={owner.image} alt={owner.name} style={{ height: '200px', objectFit: 'cover' }} />
+                        <Card className="text-center h-100">
+                            <Card.Img
+                                variant="top"
+                                src={owner.image}
+                                alt={owner.name}
+                                style={{ height: '200px', objectFit: 'cover' }}
+                            />
                             <Card.Body>
                                 <Card.Title>{owner.name}</Card.Title>
                                 <Card.Text>
                                     <strong>ID:</strong> {owner.id} <br />
-                                    <strong>Email:</strong> <a href={`mailto:${owner.email}`}>{owner.email}</a> <br />
-                                    <strong>Phone:</strong> {owner.phone} <br />
+                                    <strong>Email:</strong>{' '}
+                                    <a href={`mailto:${owner.email}`}>{owner.email}</a> <br />
+                                    {owner.phone && (
+                                        <>
+                                            <strong>Phone:</strong> {owner.phone} <br />
+                                        </>
+                                    )}
                                 </Card.Text>
                             </Card.Body>
                         </Card>

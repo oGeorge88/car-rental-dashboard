@@ -1,5 +1,6 @@
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const FilterSearch = ({ onFilter }) => {
   const [query, setQuery] = useState('');
@@ -28,6 +29,9 @@ const FilterSearch = ({ onFilter }) => {
       </Row>
     </Form>
   );
+};
+FilterSearch.propTypes = {
+  onFilter: PropTypes.func.isRequired,
 };
 
 export default FilterSearch;

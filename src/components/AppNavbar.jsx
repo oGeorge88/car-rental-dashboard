@@ -16,7 +16,7 @@ const AppNavbar = () => {
             src={Logo}
             style={{ width: "60px", height: "auto", marginRight: "10px" }}
           />{" "}
-          Groot Car Analytics
+          Groot Car Analytics & Sales 
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
@@ -29,6 +29,9 @@ const AppNavbar = () => {
             </Nav.Link>
             <Nav.Link as={Link} to="/statistics">
               Statistics
+            </Nav.Link>
+            <Nav.Link as={Link} to="/loan-advisor">
+              Loan Advisor
             </Nav.Link>
             <Nav.Link as={Link} to="/about">
               About
