@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/car-analytics/',  // Set the base path
+  base: '/car-rental-dashboard/',  // Set the base path
 })

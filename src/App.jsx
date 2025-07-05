@@ -11,7 +11,7 @@ import SmartCarLoanAdvisor from './components/SmartCarLoanAdvisor';
 
 function App() {
   return (
-    <Router basename='/car-analytics/'>
+    <Router basename='/car-rental-dashboard/'>
       <AppNavbar />
       <Routes>
         <Route path="/" element={<Dashboard />} />
