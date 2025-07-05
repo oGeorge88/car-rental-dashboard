@@ -1,162 +1,203 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, Button, Card, Alert, Table } from 'react-bootstrap';
-import carData from '../data/cars.json';
+import { useState, useEffect } from 'react';
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Card,
+  Alert,
+  Table,
+} from 'react-bootstrap';
 import './SmartCarLoanAdvisor.css';
+import { FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 
 const SmartCarLoanAdvisor = () => {
+  /* ---------------- State ---------------- */
+  const [allCars, setAllCars] = useState([]);          // full data set
+  const [availableCars, setAvailableCars] = useState([]);
+  const [selectedCar, setSelectedCar] = useState(null);
+
   const [purpose, setPurpose] = useState('family');
   const [creditScore, setCreditScore] = useState('');
   const [salary, setSalary] = useState('');
+
+  // loan‑input states
   const [downPayment, setDownPayment] = useState('');
   const [interestRate, setInterestRate] = useState('');
   const [loanTerm, setLoanTerm] = useState('');
   const [startDate, setStartDate] = useState('');
+
+  // output states
   const [recommendation, setRecommendation] = useState(null);
   const [loanResult, setLoanResult] = useState(null);
-  const [selectedCar, setSelectedCar] = useState(null);
-  const [availableCars, setAvailableCars] = useState([]);
 
-  // Car categories based on purpose - using actual model names from the data
+  /* ------------ 1. Load car data ------------ */
+  useEffect(() => {
+    fetch('/data/cars.json')
+      .then((res) => res.json())
+      .then((data) => setAllCars(data.Cars || []))
+      .catch((err) =>
+        console.error('❌ Failed to load /data/cars.json ‑', err)
+      );
+  }, []);
+
+  /* ------------ 2. Helper tables ------------ */
   const carCategories = {
-    family: ['CRV', 'HRV', 'X1', 'X7', 'ALPHARD', 'FORTUNER', 'COROLLA CROSS', 'MU-X', 'EVEREST', 'STEPWAGON', 'STARIA'],
-    commute: ['CIVIC', 'MG 3', 'MG 4', 'MG 5', 'CITY', 'YARIS', 'ALMERA', 'ATTRAGE', 'CIAZ', 'SWIFT', 'MAZDA2', 'ZS'],
-    travel: ['CRV', 'X1', 'X7', 'FORTUNER', 'COROLLA CROSS', 'MU-X', 'EVEREST', 'PAJERO', 'RANGER'],
-    heavy: ['RANGER', 'TRITON', 'D-MAX', 'NAVARA', 'HILUX', 'CARRY PICKUP']
+    family: [
+      'CRV',
+      'HRV',
+      'X1',
+      'X7',
+      'ALPHARD',
+      'FORTUNER',
+      'COROLLA CROSS',
+      'MU-X',
+      'EVEREST',
+      'STEPWAGON',
+      'STARIA',
+    ],
+    commute: [
+      'CIVIC',
+      'MG 3',
+      'MG 4',
+      'MG 5',
+      'CITY',
+      'YARIS',
+      'ALMERA',
+      'ATTRAGE',
+      'CIAZ',
+      'SWIFT',
+      'MAZDA2',
+      'ZS',
+    ],
+    travel: [
+      'CRV',
+      'X1',
+      'X7',
+      'FORTUNER',
+      'COROLLA CROSS',
+      'MU-X',
+      'EVEREST',
+      'PAJERO',
+      'RANGER',
+    ],
+    heavy: ['RANGER', 'TRITON', 'D-MAX', 'NAVARA', 'HILUX', 'CARRY PICKUP'],
   };
 
-  // Get cars based on purpose
-  const getCarsByPurpose = (purpose) => {
-    const categories = carCategories[purpose];
-    console.log('Looking for categories:', categories);
-    console.log('Total cars in database:', carData.Cars.length);
-    
-    const filteredCars = carData.Cars.filter(car => {
-      const model = car.Model?.toUpperCase() || '';
-      const nameMMT = car.NameMMT?.toUpperCase() || '';
-      
-      // Check if the model or name contains any of the category keywords
-      const matches = categories.some(category => 
-        model.includes(category) || nameMMT.includes(category)
-      );
-      
-      if (matches) {
-        console.log('Found matching car:', car.Model, car.NameMMT, car.Prc);
-      }
-      
-      return matches;
+  /* ------------ 3. Recommendation logic ------------ */
+  const getCarsByPurpose = (useCase) => {
+    const keywords = carCategories[useCase] ?? [];
+    const matches = allCars.filter((car) => {
+      const model = (car.Model || '').toUpperCase();
+      const name = (car.NameMMT || '').toUpperCase();
+      return keywords.some((kw) => model.includes(kw) || name.includes(kw));
     });
-    
-    console.log('Filtered cars found:', filteredCars.length);
-    
-    // If no cars found with specific categories, return some general cars
-    if (filteredCars.length === 0) {
-      console.log('No specific cars found, returning first 10 cars');
-      return carData.Cars.slice(0, 10); // Return first 10 cars as fallback
-    }
-    
-    return filteredCars.slice(0, 15); // Return more cars for variety
+    return matches.length ? matches.slice(0, 15) : allCars.slice(0, 10);
   };
 
   const recommendCar = () => {
     if (!creditScore || !salary) {
-      alert('Please fill in all required fields');
+      alert('Please fill in credit score and salary first.');
+      return;
+    }
+    if (allCars.length === 0) {
+      alert('Car data not loaded yet. Please wait a moment and try again.');
       return;
     }
 
+    /* ---- affordability multiplier ---- */
+    const score = parseInt(creditScore, 10);
+    const monthSalary = parseInt(salary, 10);
+    if (isNaN(score) || isNaN(monthSalary)) {
+      alert('Invalid credit score or salary.');
+      return;
+    }
+    const multiplier = score >= 750 ? 1 : score >= 650 ? 0.75 : 0.5;
+    const maxAffordable = monthSalary * multiplier * 12;
+
+    /* ---- filter cars ---- */
     const cars = getCarsByPurpose(purpose);
-    console.log('Found cars:', cars.length);
+    const affordable = [];
+    const expensive = [];
 
-    if (cars.length === 0) {
-      setRecommendation({
-        message: 'No cars found for this purpose. Please try a different category.',
-        affordable: false
-      });
-      return;
-    }
-
-    // Calculate max affordable price based on credit score and salary
-    let maxLoanMultiplier = 0.5;
-    if (creditScore >= 750) maxLoanMultiplier = 1.0;
-    else if (creditScore >= 650) maxLoanMultiplier = 0.75;
-
-    const maxAffordableCarPrice = parseInt(salary) * maxLoanMultiplier * 12;
-
-    // Categorize cars by affordability
-    const affordableCars = [];
-    const expensiveCars = [];
-
-    cars.forEach(car => {
-      const price = parseInt(car.Prc.replace(/,/g, ''));
-      if (price <= maxAffordableCarPrice) {
-        affordableCars.push(car);
-      } else {
-        expensiveCars.push(car);
-      }
+    cars.forEach((c) => {
+      const price = parseInt(c.Prc.replace(/,/g, ''), 10) || 0;
+      (price <= maxAffordable ? affordable : expensive).push(c);
     });
 
-    // Set available cars for selection
-    const allAvailableCars = [...affordableCars, ...expensiveCars].slice(0, 8);
-    setAvailableCars(allAvailableCars);
+    setAvailableCars([...affordable, ...expensive].slice(0, 8));
+    setSelectedCar(null);       // reset any previous pick
+    setLoanResult(null);        // clear prior loan calc
 
-    // Set recommendation message
-    if (affordableCars.length > 0) {
-      setRecommendation({
-        message: `✅ Found ${affordableCars.length} cars within your budget! Choose from the options below.`,
-        affordable: true,
-        affordableCount: affordableCars.length
-      });
-    } else {
-      setRecommendation({
-        message: `⚠️ All cars are above your ideal budget. Consider higher down payment or longer loan term.`,
-        affordable: false,
-        affordableCount: 0
-      });
-    }
+    setRecommendation({
+      message:
+        affordable.length > 0
+          ? `✅ Found ${affordable.length} cars within budget.`
+          : '⚠️ All suggested cars exceed your ideal budget.',
+      affordable: affordable.length > 0,
+      affordableCount: affordable.length,
+    });
   };
 
-  const selectCar = (car) => {
-    setSelectedCar(car);
-  };
-
+  /* ------------ 4. Loan calculation ------------ */
   const calculateLoan = () => {
-    if (!selectedCar || !downPayment || !interestRate || !loanTerm || !startDate) {
-      alert('Please fill in all loan calculation fields');
+    if (
+      !selectedCar ||
+      !downPayment ||
+      !interestRate ||
+      !loanTerm ||
+      !startDate
+    ) {
+      alert('Please complete all loan input fields.');
       return;
     }
 
-    const carPrice = parseInt(selectedCar.Prc.replace(/,/g, ''));
-    const downPaymentAmount = parseFloat(downPayment);
+    const price = parseInt(selectedCar.Prc.replace(/,/g, ''), 10);
+    const down = parseFloat(downPayment);
     const rate = parseFloat(interestRate) / 100 / 12;
-    const term = parseInt(loanTerm);
-    const start = new Date(startDate);
+    const term = parseInt(loanTerm, 10);
 
-    const loanAmount = carPrice - downPaymentAmount;
-    const monthlyPayment = (loanAmount * rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
-
-    // Generate payment schedule
-    const paymentSchedule = [];
-    let paymentDate = new Date(start);
-    
-    for (let i = 1; i <= term; i++) {
-      paymentDate = new Date(paymentDate);
-      paymentDate.setMonth(paymentDate.getMonth() + 1);
-      paymentSchedule.push({
-        month: i,
-        date: paymentDate.toISOString().split('T')[0],
-        amount: monthlyPayment.toFixed(2)
-      });
+    if ([price, down, rate, term].some((x) => isNaN(x) || x <= 0)) {
+      alert('Please enter valid numeric values.');
+      return;
     }
 
+    const loanAmount = price - down;
+    const monthly =
+      (loanAmount * rate * Math.pow(1 + rate, term)) /
+      (Math.pow(1 + rate, term) - 1);
+
+    /* schedule */
+    const schedule = [];
+    const start = new Date(startDate);
     const endDate = new Date(start);
-    endDate.setMonth(endDate.getMonth() + term);
+    for (let i = 1; i <= term; i++) {
+      const payDate = new Date(start);
+      payDate.setMonth(start.getMonth() + i);
+      schedule.push({
+        month: i,
+        date: payDate.toISOString().split('T')[0],
+        amount: monthly.toFixed(2),
+      });
+    }
+    endDate.setMonth(start.getMonth() + term);
 
     setLoanResult({
       loanAmount: loanAmount.toFixed(2),
-      monthlyPayment: monthlyPayment.toFixed(2),
+      monthlyPayment: monthly.toFixed(2),
       endDate: endDate.toISOString().split('T')[0],
-      paymentSchedule
+      paymentSchedule: schedule,
     });
   };
+
+  /* ------------ 5. Render ------------ */
+  const maxAffordable =
+    creditScore && salary
+      ? parseInt(salary, 10) *
+        (creditScore >= 750 ? 1 : creditScore >= 650 ? 0.75 : 0.5) *
+        12
+      : 0;
 
   return (
     <Container className="mt-5 pt-5">
@@ -166,14 +207,16 @@ const SmartCarLoanAdvisor = () => {
             <Card.Header className="bg-primary text-white text-center">
               <h1 className="mb-0">Smart Car Loan Advisor</h1>
             </Card.Header>
+
             <Card.Body className="p-4">
               <Row>
+                {/* ---------------- LEFT COLUMN ---------------- */}
                 <Col md={6}>
-                  <h2 className="text-primary mb-3">1. Choose Your Purpose</h2>
-                  <Form.Select 
-                    value={purpose} 
+                  <h4 className="text-primary mb-3">1. Car Usage Purpose</h4>
+                  <Form.Select
+                    value={purpose}
                     onChange={(e) => setPurpose(e.target.value)}
-                    className="mb-3"
+                    className="mb-4"
                   >
                     <option value="family">Family</option>
                     <option value="commute">Commute</option>
@@ -181,138 +224,181 @@ const SmartCarLoanAdvisor = () => {
                     <option value="heavy">Heavy Load</option>
                   </Form.Select>
 
-                  <h2 className="text-primary mb-3">2. Enter Your Financial Information</h2>
+                  <h4 className="text-primary mb-3">2. Your Finances</h4>
+
                   <Form.Group className="mb-3">
-                    <Form.Label>Credit Score (300 - 850)</Form.Label>
+                    <Form.Label>Credit Score (300 – 850)</Form.Label>
                     <Form.Control
                       type="number"
                       min="300"
                       max="850"
                       value={creditScore}
                       onChange={(e) => setCreditScore(e.target.value)}
-                      placeholder="Enter your credit score"
+                      placeholder="e.g. 720"
                     />
                   </Form.Group>
 
-                  <Form.Group className="mb-3">
+                  <Form.Group className="mb-4">
                     <Form.Label>Monthly Salary (THB)</Form.Label>
                     <Form.Control
                       type="number"
                       value={salary}
                       onChange={(e) => setSalary(e.target.value)}
-                      placeholder="Enter your monthly salary"
+                      placeholder="e.g. 45,000"
                     />
                   </Form.Group>
 
-                  <Button 
-                    variant="primary" 
-                    size="lg" 
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    className="w-100"
                     onClick={recommendCar}
-                    className="w-100 mb-4"
                   >
                     Get Recommendations
                   </Button>
                 </Col>
 
+                {/* ---------------- RIGHT COLUMN ---------------- */}
                 <Col md={6}>
                   {recommendation && (
-                    <Alert variant={recommendation.affordable ? "success" : "warning"}>
-                      <h4>Car Recommendations</h4>
-                      <p>{recommendation.message}</p>
-                      {recommendation.affordableCount > 0 && (
-                        <p><strong>Affordable cars found: {recommendation.affordableCount}</strong></p>
+                    <Alert
+                      variant={recommendation.affordable ? 'success' : 'warning'}
+                    >
+                      <h5 className="d-flex align-items-center mb-2">
+                        {recommendation.affordable ? (
+                          <FaCheckCircle className="me-2 text-success" />
+                        ) : (
+                          <FaExclamationTriangle className="me-2 text-warning" />
+                        )}
+                        Car Recommendations
+                      </h5>
+                      <p className="mb-0">{recommendation.message}</p>
+                      {recommendation.affordable && (
+                        <p className="mb-0 fw-bold">
+                          Affordable options: {recommendation.affordableCount}
+                        </p>
                       )}
                     </Alert>
                   )}
 
+                  {/* ---- Available cars list ---- */}
                   {availableCars.length > 0 && (
-                    <div className="mt-3">
-                      <h4>Available Cars</h4>
+                    <>
+                      <h5 className="mt-3">Available Cars</h5>
                       <Row>
-                        {availableCars.map((car, index) => {
-                          const price = parseInt(car.Prc.replace(/,/g, ''));
-                          const maxAffordablePrice = parseInt(salary) * (creditScore >= 750 ? 1.0 : creditScore >= 650 ? 0.75 : 0.5) * 12;
-                          const isAffordable = price <= maxAffordablePrice;
-                          
+                        {availableCars.map((car) => {
+                          const price = parseInt(
+                            car.Prc.replace(/,/g, ''),
+                            10
+                          );
+                          const isAffordable = price <= maxAffordable;
+
                           return (
                             <Col md={6} key={car.Cid} className="mb-3">
-                              <Card 
-                                className={`h-100 ${selectedCar?.Cid === car.Cid ? 'border-primary' : ''} ${isAffordable ? 'border-success' : 'border-warning'}`}
-                                onClick={() => selectCar(car)}
+                              <Card
+                                className={`h-100 ${
+                                  selectedCar?.Cid === car.Cid
+                                    ? 'border-primary'
+                                    : ''
+                                } ${
+                                  isAffordable
+                                    ? 'border-success'
+                                    : 'border-warning'
+                                }`}
                                 style={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                  setSelectedCar(car);
+                                  setLoanResult(null); // clear any old loan calc
+                                }}
                               >
-                                <img 
-                                  src={car.Img300} 
+                                <img
+                                  src={car.Img300}
                                   alt={car.Model}
                                   className="card-img-top"
-                                  style={{ height: '120px', objectFit: 'cover' }}
+                                  style={{
+                                    height: '120px',
+                                    objectFit: 'cover',
+                                  }}
                                 />
                                 <Card.Body className="p-2">
                                   <h6 className="mb-1">{car.Model}</h6>
-                                  <p className="mb-1 small text-muted">{car.NameMMT}</p>
-                                  <p className="mb-1"><strong>{car.Prc} THB</strong></p>
-                                  <p className="mb-1 small">{car.Yr} • {car.Province}</p>
-                                  {isAffordable ? (
-                                    <span className="badge bg-success">Affordable</span>
-                                  ) : (
-                                    <span className="badge bg-warning">Above Budget</span>
-                                  )}
+                                  <p className="mb-1 small text-muted">
+                                    {car.NameMMT}
+                                  </p>
+                                  <p className="mb-1 fw-bold">{car.Prc} THB</p>
+                                  <p className="mb-1 small">
+                                    {car.Yr} • {car.Province}
+                                  </p>
+                                  <span
+                                    className={`badge ${
+                                      isAffordable
+                                        ? 'bg-success'
+                                        : 'bg-warning'
+                                    }`}
+                                  >
+                                    {isAffordable
+                                      ? 'Affordable'
+                                      : 'Above Budget'}
+                                  </span>
                                 </Card.Body>
                               </Card>
                             </Col>
                           );
                         })}
                       </Row>
-                    </div>
+                    </>
                   )}
 
+                  {/* ---- Loan planner ---- */}
                   {selectedCar && (
-                    <Card className="mt-3">
+                    <Card className="mt-4">
                       <Card.Header>
-                        <h3 className="mb-0">3. Loan Planning for {selectedCar.Model}</h3>
+                        <h5 className="mb-0">
+                          3. Loan Planner — {selectedCar.Model}
+                        </h5>
                       </Card.Header>
                       <Card.Body>
-                        <div className="mb-3">
-                          <img 
-                            src={selectedCar.Img300} 
-                            alt={selectedCar.Model}
-                            className="img-fluid rounded mb-2"
-                            style={{ maxHeight: '150px' }}
-                          />
-                          <h5>{selectedCar.NameMMT}</h5>
-                          <p className="mb-1"><strong>Price:</strong> {selectedCar.Prc} THB</p>
-                          <p className="mb-1"><strong>Year:</strong> {selectedCar.Yr}</p>
-                          <p className="mb-1"><strong>Location:</strong> {selectedCar.Province}</p>
-                        </div>
+                        <img
+                          src={selectedCar.Img300}
+                          alt={selectedCar.Model}
+                          className="img-fluid rounded mb-3"
+                          style={{ maxHeight: '140px', objectFit: 'cover' }}
+                        />
+                        <p className="mb-1">
+                          <strong>Price:</strong> {selectedCar.Prc} THB
+                        </p>
+                        <p className="mb-1">
+                          <strong>Year:</strong> {selectedCar.Yr}
+                        </p>
+                        <p className="mb-3">
+                          <strong>Location:</strong> {selectedCar.Province}
+                        </p>
 
-                        <Form.Group className="mb-3">
+                        <Form.Group className="mb-2">
                           <Form.Label>Down Payment (THB)</Form.Label>
                           <Form.Control
                             type="number"
                             value={downPayment}
                             onChange={(e) => setDownPayment(e.target.value)}
-                            placeholder="Enter down payment amount"
                           />
                         </Form.Group>
 
-                        <Form.Group className="mb-3">
+                        <Form.Group className="mb-2">
                           <Form.Label>Annual Interest Rate (%)</Form.Label>
                           <Form.Control
                             type="number"
                             step="0.1"
                             value={interestRate}
                             onChange={(e) => setInterestRate(e.target.value)}
-                            placeholder="Enter interest rate"
                           />
                         </Form.Group>
 
-                        <Form.Group className="mb-3">
+                        <Form.Group className="mb-2">
                           <Form.Label>Loan Term (months)</Form.Label>
                           <Form.Control
                             type="number"
                             value={loanTerm}
                             onChange={(e) => setLoanTerm(e.target.value)}
-                            placeholder="Enter loan term in months"
                           />
                         </Form.Group>
 
@@ -325,11 +411,7 @@ const SmartCarLoanAdvisor = () => {
                           />
                         </Form.Group>
 
-                        <Button 
-                          variant="success" 
-                          onClick={calculateLoan}
-                          className="w-100"
-                        >
+                        <Button className="w-100" onClick={calculateLoan}>
                           Calculate Loan
                         </Button>
                       </Card.Body>
@@ -338,57 +420,56 @@ const SmartCarLoanAdvisor = () => {
                 </Col>
               </Row>
 
+              {/* ---- Loan results ---- */}
               {loanResult && (
                 <Row className="mt-4">
                   <Col>
                     <Card>
                       <Card.Header>
-                        <h3 className="mb-0">Loan Calculation Results</h3>
+                        <h4 className="mb-0">Loan Calculation Results</h4>
                       </Card.Header>
                       <Card.Body>
-                        <Row>
+                        <Row className="text-center">
                           <Col md={4}>
-                            <div className="text-center p-3 bg-light rounded">
-                              <h5>Loan Amount</h5>
-                              <h3 className="text-primary">{loanResult.loanAmount} THB</h3>
-                            </div>
+                            <h6>Loan Amount</h6>
+                            <h3 className="text-primary">
+                              {loanResult.loanAmount} THB
+                            </h3>
                           </Col>
                           <Col md={4}>
-                            <div className="text-center p-3 bg-light rounded">
-                              <h5>Monthly Payment</h5>
-                              <h3 className="text-success">{loanResult.monthlyPayment} THB</h3>
-                            </div>
+                            <h6>Monthly Payment</h6>
+                            <h3 className="text-success">
+                              {loanResult.monthlyPayment} THB
+                            </h3>
                           </Col>
                           <Col md={4}>
-                            <div className="text-center p-3 bg-light rounded">
-                              <h5>Loan End Date</h5>
-                              <h3 className="text-info">{loanResult.endDate}</h3>
-                            </div>
+                            <h6>Loan Ends</h6>
+                            <h3 className="text-info">
+                              {loanResult.endDate}
+                            </h3>
                           </Col>
                         </Row>
 
-                        <div className="mt-4">
-                          <h4>Payment Schedule</h4>
-                          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                            <Table striped bordered hover>
-                              <thead>
-                                <tr>
-                                  <th>Month</th>
-                                  <th>Payment Date</th>
-                                  <th>Amount (THB)</th>
+                        <h5 className="mt-4">Payment Schedule</h5>
+                        <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                          <Table striped bordered hover size="sm">
+                            <thead>
+                              <tr>
+                                <th>Month</th>
+                                <th>Payment Date</th>
+                                <th>Amount (THB)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {loanResult.paymentSchedule.map((row) => (
+                                <tr key={row.month}>
+                                  <td>{row.month}</td>
+                                  <td>{row.date}</td>
+                                  <td>{row.amount}</td>
                                 </tr>
-                              </thead>
-                              <tbody>
-                                {loanResult.paymentSchedule.map((payment, index) => (
-                                  <tr key={index}>
-                                    <td>{payment.month}</td>
-                                    <td>{payment.date}</td>
-                                    <td>{payment.amount}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </Table>
-                          </div>
+                              ))}
+                            </tbody>
+                          </Table>
                         </div>
                       </Card.Body>
                     </Card>
@@ -403,4 +484,4 @@ const SmartCarLoanAdvisor = () => {
   );
 };
 
-export default SmartCarLoanAdvisor; 
+export default SmartCarLoanAdvisor;

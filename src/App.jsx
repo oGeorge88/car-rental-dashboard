@@ -11,7 +11,7 @@ import SmartCarLoanAdvisor from './components/SmartCarLoanAdvisor';
 
 function App() {
   return (
-    <Router basename="/">  // ✅ Remove subfolder base
+    <Router basename="/"> 
       <AppNavbar />
       <Routes>
         <Route path="/" element={<Dashboard />} />

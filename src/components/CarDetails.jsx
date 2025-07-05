@@ -224,17 +224,23 @@ export default CarDetails;*/
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, Container, Row, Col } from 'react-bootstrap';
-import carDataJson from '/src/data/cars.json';
-import PurchaseCalculator from './PurchaseCalculator'; // make sure this path is correct
+import PurchaseCalculator from './PurchaseCalculator'; // keep path if this is correct
 
 const CarDetails = () => {
   const { id } = useParams();
   const [car, setCar] = useState(null);
 
   useEffect(() => {
-    const data = carDataJson;
-    const selectedCar = data.Cars.find((car) => car.Cid === parseInt(id));
-    setCar(selectedCar);
+    // Fetch the JSON from public folder
+    fetch('/data/cars.json')
+      .then((res) => res.json())
+      .then((data) => {
+        const selectedCar = data.Cars.find((car) => car.Cid === parseInt(id));
+        setCar(selectedCar);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch car data:', err);
+      });
   }, [id]);
 
   if (!car) return <div className="text-center my-5">Loading...</div>;

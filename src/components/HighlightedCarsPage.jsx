@@ -2,17 +2,23 @@ import { useState, useEffect } from 'react';
 import { Card, Row, Col, Container, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
-import carDataJson from '/src/data/cars.json'; // Adjust the path according to your project structure
 
 const HighlightedCarPage = () => {
     const [highlightedCars, setHighlightedCars] = useState([]);
 
     useEffect(() => {
-        const data = carDataJson;
-        const highlighted = data.Cars.filter(car =>
-            localStorage.getItem(`highlighted_${car.Cid}`) === 'true'
-        );
-        setHighlightedCars(highlighted);
+        // Fetch car data from the public folder
+        fetch('/data/cars.json')
+            .then((response) => response.json())
+            .then((data) => {
+                const highlighted = data.Cars.filter(car =>
+                    localStorage.getItem(`highlighted_${car.Cid}`) === 'true'
+                );
+                setHighlightedCars(highlighted);
+            })
+            .catch((err) => {
+                console.error("Failed to load car data:", err);
+            });
     }, []);
 
     const removeHighlight = (Cid) => {
@@ -25,43 +31,43 @@ const HighlightedCarPage = () => {
 
     return (
         <Container style={{ marginTop: '130px' }}>
-            <h2>Highlighted Cars</h2>
+            <h2 className="text-center mb-4">Highlighted Cars</h2>
             <Row className="mt-3 gy-4">
                 {highlightedCars.length > 0 ? (
                     highlightedCars.map((car) => (
                         <Col sm={12} md={6} lg={4} key={car.Cid}>
-                            <Card>
+                            <Card className="shadow-lg rounded-3">
                                 <Card.Body>
-                                    <Card.Title>
-                                        <Link to={`/car/${car.Cid}`}>
+                                    <Card.Title className="text-center">
+                                        <Link to={`/car/${car.Cid}`} style={{ color: '#023047', fontWeight: 'bold' }}>
                                             {car.NameMMT}
                                         </Link>
                                     </Card.Title>
-                                    <Card.Text>
-                                        Model: {car.Model} <br />
-                                        Year: {car.Yr} <br />
-                                        Price: {car.Prc} {car.Currency} <br />
-                                        Province: {car.Province} <br />
+                                    <Card.Text style={{ textAlign: 'center' }}>
+                                        <strong>Model:</strong> {car.Model} <br />
+                                        <strong>Year:</strong> {car.Yr} <br />
+                                        <strong>Price:</strong> {car.Prc} {car.Currency} <br />
+                                        <strong>Province:</strong> {car.Province} <br />
                                     </Card.Text>
-                                    <div>
-                                        <Link to={`/car/${car.Cid}`}>
-                                            {car.Img300 && <img src={car.Img300} alt={car.Model} style={{ width: '100%' }} />}
-                                        </Link>
+                                    <div className="text-center">
+                                        {car.Img300 && <img src={car.Img300} alt={car.Model} style={{ width: '100%', height: 'auto', maxHeight: '250px', objectFit: 'cover', borderRadius: '10px' }} />}
                                     </div>
-                                    <Button
-                                        variant="danger"
-                                        onClick={() => removeHighlight(car.Cid)}
-                                        className="mt-3 d-flex align-items-center"
-                                    >
-                                        Remove Highlight <FaStar className="ms-2" />
-                                    </Button>
+                                    <div className="d-flex justify-content-center mt-3">
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => removeHighlight(car.Cid)}
+                                            className="d-flex align-items-center"
+                                        >
+                                            Remove Highlight <FaStar className="ms-2" />
+                                        </Button>
+                                    </div>
                                 </Card.Body>
                             </Card>
                         </Col>
                     ))
                 ) : (
                     <Col>
-                        <p>No highlighted cars found.</p>
+                        <p className="text-center">No highlighted cars found.</p>
                     </Col>
                 )}
             </Row>
