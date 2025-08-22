@@ -1,35 +1,32 @@
+# 🚗 Car Rental Dashboard
 
-# 🚗 Car Purchase Calculator App
-
-This React-based web application allows users to **calculate loan schedules** for car purchases with customizable inputs like **down payment**, **loan term**, **interest rate**, and optional **insurance**. It also supports **flat or reducing interest** models and provides **PDF exports** of the payment schedule. Users can **confirm purchases**, which are saved in `localStorage`.
+A modern, professional React dashboard for car rental management, analytics, and smart car loan advising. This project features a clean UI, accessibility best practices, and robust functionality for both users and admins.
 
 ---
 
-## ✨ Features
+## ✨ Professional Features & Improvements
 
-* 🔢 **Loan Payment Calculator**:
-
-  * Supports **flat** and **reducing balance** interest calculations.
-  * Accepts down payments as **THB amount** or **percentage**.
-  * Customizable **loan duration** and **interest rate**.
-  * Optional **insurance premium** (2% of car price).
-
-* 📅 **Monthly Amortization Schedule**:
-
-  * Detailed monthly breakdown: principal, interest, total payment, and remaining balance.
-
-* 📄 **PDF Export**:
-
-  * Downloadable loan summary and payment schedule using `jsPDF`.
-
-* 💾 **LocalStorage Transactions**:
-
-  * Confirmed purchases are saved locally with details like date, car name/model, and total cost.
-
-* 🛒 **Car Details Integration**:
-
-  * Displays car details dynamically from `cars.json`.
-  * Integrated into a `CarDetails` page using route params.
+- **Modern UI/UX:**
+  - All major components updated for clarity, accessibility, and visual appeal.
+  - Responsive layouts, semantic HTML, and consistent color palette.
+- **Component Updates:**
+  - About, AppNavbar, HighlightedCarsPage, BookingCalculator, CarDetails, ContactPage, Dashboard, FilterSearch, Footer, PurchaseCalculator, ScrollToTop, SmartCarLoanAdvisor (JSX & CSS), StatisticsPage.
+- **Global Styles:**
+  - `App.css` and component CSS files professionally refined for modern look and feel.
+- **Routing & Structure:**
+  - Clean React Router setup in `App.jsx`.
+  - Main entry (`main.jsx`) follows best practices.
+- **Meta & SEO:**
+  - `index.html` updated with SEO, Open Graph, and accessibility meta tags.
+- **Project Hygiene:**
+  - Comprehensive `.gitignore` for Node.js, Vite, editors, OS, and build artifacts.
+- **Data & Persistence:**
+  - Car data in `cars.json`.
+  - Purchases saved in `localStorage`.
+- **PDF Export:**
+  - Loan schedules and summaries downloadable via PDF.
+- **Statistics & Analytics:**
+  - Interactive charts and tables for car brands, models, and values.
 
 ---
 
@@ -37,34 +34,45 @@ This React-based web application allows users to **calculate loan schedules** fo
 
 ```bash
 /src
-├── components
-│   └── PurchaseCalculator.jsx    # Loan calculator logic and UI
-├── pages
-│   └── CarDetails.jsx            # Renders car info + calculator
-├── data
-│   └── cars.json                 # Static car dataset
+  ├── components
+  │   ├── About.jsx
+  │   ├── AppNavbar.jsx
+  │   ├── BookingCalculator.jsx
+  │   ├── CarDetails.jsx
+  │   ├── ContactPage.jsx
+  │   ├── Dashboard.jsx
+  │   ├── FilterSearch.jsx
+  │   ├── Footer.jsx
+  │   ├── HighlightedCarsPage.jsx
+  │   ├── PurchaseCalculator.jsx
+  │   ├── ScrollToTop.jsx
+  │   ├── SmartCarLoanAdvisor.jsx
+  │   ├── SmartCarLoanAdvisor.css
+  │   ├── StatisticsPage.jsx
+  ├── data
+  │   └── cars.json
+  ├── styles
+  │   └── styles.css
+  ├── App.jsx
+  ├── App.css
+  ├── main.jsx
 ```
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/yourusername/car-purchase-calculator.git
-cd car-purchase-calculator
+1. **Clone the repository**
+   ```bash
+git clone https://github.com/oGeorge88/car-rental-dashboard.git
+cd car-rental-dashboard
 ```
-
-### 2. Install dependencies
-
-```bash
+2. **Install dependencies**
+   ```bash
 npm install
 ```
-
-### 3. Run the app
-
-```bash
+3. **Run the app**
+   ```bash
 npm start
 ```
 
@@ -76,7 +84,6 @@ npm start
 | --------------------------- | ------------------------------ |
 | `react-bootstrap`           | UI components                  |
 | `jsPDF` + `jspdf-autotable` | PDF generation                 |
-| `prop-types`                | Type validation for components |
 | `react-router-dom`          | Page routing                   |
 | `bootstrap`                 | Styling                        |
 
@@ -84,40 +91,14 @@ npm start
 
 ## 🧠 Usage Guide
 
-1. Navigate to a car details page (e.g., `/car/2`).
-2. View car specifications (model, price, year, etc.).
-3. In the "Purchase this Car" section:
-
-   * Enter down payment (as % or THB).
-   * Set loan term and interest rate.
-   * Select interest type (flat or reducing).
-   * Optionally include insurance.
-4. Click **Calculate** to view the schedule.
-5. Click **Confirm Purchase** to save.
-6. Click **Export to PDF** for a downloadable summary.
+- Browse cars, view details, and calculate smart loan schedules.
+- Export loan schedules to PDF.
+- View statistics and analytics for your car inventory.
+- All actions and pages feature a modern, accessible UI.
 
 ---
 
-## 📝 Example
-
-**Input:**
-
-* Car Price: 600,000 THB
-* Down Payment: 20%
-* Loan Term: 36 months
-* Interest: 5%
-* Interest Type: Reducing Balance
-
-**Output:**
-
-* Monthly Payment: \~17,980 THB
-* Insurance: 12,000 THB
-* Total Cost: \~660,000 THB
-* PDF with full schedule available for download
-
----
-
-## 📁 Sample Data Format (`cars.json`)
+## 📝 Example Data
 
 ```json
 {
@@ -141,32 +122,31 @@ npm start
 
 ## 🔒 Data Persistence
 
-* **Confirmed Purchases** are stored in `localStorage`:
-
-  ```json
-  {
-    "carName": "Toyota Corolla",
-    "carModel": "Altis",
-    "amount": 660000,
-    "date": "2025-07-05T12:34:56.789Z",
-    "type": "purchase"
-  }
-  ```
+Confirmed purchases are stored in `localStorage`:
+```json
+{
+  "carName": "Toyota Corolla",
+  "carModel": "Altis",
+  "amount": 660000,
+  "date": "2025-07-05T12:34:56.789Z",
+  "type": "purchase"
+}
+```
 
 ---
 
 ## 📌 TODO / Improvements
 
-* Add **authentication** and backend database.
-* Display **purchase history** with edit/delete options.
-* Enhance PDF styling and branding.
-* Add currency toggle (e.g., THB ⇌ USD).
+- Add authentication and backend database.
+- Display purchase history with edit/delete options.
+- Enhance PDF styling and branding.
+- Add currency toggle (e.g., THB ⇌ USD).
 
 ---
 
 ## 🧑‍💻 Author
 
-**George Obinna**
+**George Obinna**  
 Front-End Developer, AHSO Event Admin System Creator
 
 ---

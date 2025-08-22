@@ -203,9 +203,9 @@ const SmartCarLoanAdvisor = () => {
     <Container className="mt-5 pt-5">
       <Row>
         <Col>
-          <Card className="shadow">
-            <Card.Header className="bg-primary text-white text-center">
-              <h1 className="mb-0">Smart Car Loan Advisor</h1>
+          <Card className="shadow rounded-4 border-0">
+            <Card.Header className="bg-primary text-white text-center rounded-top-4">
+              <h1 className="mb-0" style={{ fontWeight: '700', letterSpacing: '1px' }}>Smart Car Loan Advisor</h1>
             </Card.Header>
 
             <Card.Body className="p-4">
@@ -217,6 +217,7 @@ const SmartCarLoanAdvisor = () => {
                     value={purpose}
                     onChange={(e) => setPurpose(e.target.value)}
                     className="mb-4"
+                    aria-label="Select car usage purpose"
                   >
                     <option value="family">Family</option>
                     <option value="commute">Commute</option>
@@ -227,7 +228,7 @@ const SmartCarLoanAdvisor = () => {
                   <h4 className="text-primary mb-3">2. Your Finances</h4>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Credit Score (300 – 850)</Form.Label>
+                    <Form.Label>Credit Score (300 - 850)</Form.Label>
                     <Form.Control
                       type="number"
                       min="300"
@@ -235,6 +236,7 @@ const SmartCarLoanAdvisor = () => {
                       value={creditScore}
                       onChange={(e) => setCreditScore(e.target.value)}
                       placeholder="e.g. 720"
+                      aria-label="Credit Score"
                     />
                   </Form.Group>
 
@@ -245,6 +247,7 @@ const SmartCarLoanAdvisor = () => {
                       value={salary}
                       onChange={(e) => setSalary(e.target.value)}
                       placeholder="e.g. 45,000"
+                      aria-label="Monthly Salary"
                     />
                   </Form.Group>
 
@@ -252,6 +255,7 @@ const SmartCarLoanAdvisor = () => {
                     variant="primary"
                     size="lg"
                     className="w-100"
+                    style={{ fontWeight: '600', borderRadius: '8px' }}
                     onClick={recommendCar}
                   >
                     Get Recommendations
@@ -263,6 +267,7 @@ const SmartCarLoanAdvisor = () => {
                   {recommendation && (
                     <Alert
                       variant={recommendation.affordable ? 'success' : 'warning'}
+                      className="rounded-4"
                     >
                       <h5 className="d-flex align-items-center mb-2">
                         {recommendation.affordable ? (
@@ -296,7 +301,7 @@ const SmartCarLoanAdvisor = () => {
                           return (
                             <Col md={6} key={car.Cid} className="mb-3">
                               <Card
-                                className={`h-100 ${
+                                className={`h-100 rounded-4 border-0 ${
                                   selectedCar?.Cid === car.Cid
                                     ? 'border-primary'
                                     : ''
@@ -305,7 +310,7 @@ const SmartCarLoanAdvisor = () => {
                                     ? 'border-success'
                                     : 'border-warning'
                                 }`}
-                                style={{ cursor: 'pointer' }}
+                                style={{ cursor: 'pointer', boxShadow: '0 2px 8px rgba(40,167,69,0.07)' }}
                                 onClick={() => {
                                   setSelectedCar(car);
                                   setLoanResult(null); // clear any old loan calc
@@ -313,19 +318,20 @@ const SmartCarLoanAdvisor = () => {
                               >
                                 <img
                                   src={car.Img300}
-                                  alt={car.Model}
-                                  className="card-img-top"
+                                  alt={`Image of ${car.Model}`}
+                                  className="card-img-top rounded-top-4"
                                   style={{
                                     height: '120px',
                                     objectFit: 'cover',
+                                    background: '#f8f9fa'
                                   }}
                                 />
                                 <Card.Body className="p-2">
-                                  <h6 className="mb-1">{car.Model}</h6>
+                                  <h6 className="mb-1" style={{ color: '#218838', fontWeight: '600' }}>{car.Model}</h6>
                                   <p className="mb-1 small text-muted">
                                     {car.NameMMT}
                                   </p>
-                                  <p className="mb-1 fw-bold">{car.Prc} THB</p>
+                                  <p className="mb-1 fw-bold" style={{ color: '#28a745' }}>{car.Prc} THB</p>
                                   <p className="mb-1 small">
                                     {car.Yr} • {car.Province}
                                   </p>
@@ -351,21 +357,21 @@ const SmartCarLoanAdvisor = () => {
 
                   {/* ---- Loan planner ---- */}
                   {selectedCar && (
-                    <Card className="mt-4">
-                      <Card.Header>
-                        <h5 className="mb-0">
+                    <Card className="mt-4 rounded-4 border-0 shadow-sm">
+                      <Card.Header className="bg-light rounded-top-4">
+                        <h5 className="mb-0" style={{ color: '#218838', fontWeight: '600' }}>
                           3. Loan Planner — {selectedCar.Model}
                         </h5>
                       </Card.Header>
                       <Card.Body>
                         <img
                           src={selectedCar.Img300}
-                          alt={selectedCar.Model}
+                          alt={`Image of ${selectedCar.Model}`}
                           className="img-fluid rounded mb-3"
-                          style={{ maxHeight: '140px', objectFit: 'cover' }}
+                          style={{ maxHeight: '140px', objectFit: 'cover', background: '#f8f9fa' }}
                         />
                         <p className="mb-1">
-                          <strong>Price:</strong> {selectedCar.Prc} THB
+                          <strong>Price:</strong> {selectedCar.Prc} THB
                         </p>
                         <p className="mb-1">
                           <strong>Year:</strong> {selectedCar.Yr}
@@ -380,6 +386,7 @@ const SmartCarLoanAdvisor = () => {
                             type="number"
                             value={downPayment}
                             onChange={(e) => setDownPayment(e.target.value)}
+                            aria-label="Down Payment"
                           />
                         </Form.Group>
 
@@ -390,6 +397,7 @@ const SmartCarLoanAdvisor = () => {
                             step="0.1"
                             value={interestRate}
                             onChange={(e) => setInterestRate(e.target.value)}
+                            aria-label="Annual Interest Rate"
                           />
                         </Form.Group>
 
@@ -399,6 +407,7 @@ const SmartCarLoanAdvisor = () => {
                             type="number"
                             value={loanTerm}
                             onChange={(e) => setLoanTerm(e.target.value)}
+                            aria-label="Loan Term"
                           />
                         </Form.Group>
 
@@ -408,10 +417,11 @@ const SmartCarLoanAdvisor = () => {
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
+                            aria-label="Loan Start Date"
                           />
                         </Form.Group>
 
-                        <Button className="w-100" onClick={calculateLoan}>
+                        <Button className="w-100" style={{ fontWeight: '600', borderRadius: '8px' }} onClick={calculateLoan}>
                           Calculate Loan
                         </Button>
                       </Card.Body>
@@ -424,22 +434,22 @@ const SmartCarLoanAdvisor = () => {
               {loanResult && (
                 <Row className="mt-4">
                   <Col>
-                    <Card>
-                      <Card.Header>
-                        <h4 className="mb-0">Loan Calculation Results</h4>
+                    <Card className="rounded-4 border-0 shadow-sm">
+                      <Card.Header className="bg-light rounded-top-4">
+                        <h4 className="mb-0" style={{ color: '#218838', fontWeight: '600' }}>Loan Calculation Results</h4>
                       </Card.Header>
                       <Card.Body>
                         <Row className="text-center">
                           <Col md={4}>
                             <h6>Loan Amount</h6>
                             <h3 className="text-primary">
-                              {loanResult.loanAmount} THB
+                              {loanResult.loanAmount} THB
                             </h3>
                           </Col>
                           <Col md={4}>
                             <h6>Monthly Payment</h6>
                             <h3 className="text-success">
-                              {loanResult.monthlyPayment} THB
+                              {loanResult.monthlyPayment} THB
                             </h3>
                           </Col>
                           <Col md={4}>
@@ -452,7 +462,7 @@ const SmartCarLoanAdvisor = () => {
 
                         <h5 className="mt-4">Payment Schedule</h5>
                         <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                          <Table striped bordered hover size="sm">
+                          <Table striped bordered hover size="sm" className="rounded-4">
                             <thead>
                               <tr>
                                 <th>Month</th>

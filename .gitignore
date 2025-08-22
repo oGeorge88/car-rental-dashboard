@@ -1,5 +1,12 @@
+# Node.js & Vite build artifacts
+node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,18 +14,58 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Coverage
+coverage/
+.nyc_output/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
 
 # Editor directories and files
-.vscode/*
+.vscode/
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files
+.env
+.env.*
+
+# Misc
+*.tgz
+*.zip
+*.tar
+*.gz
+*.bak
+*.tmp
+
+# Mac system files
+.Spotlight-V100
+.Trashes
+
+# npm package lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Optional: ignore test output
+test-output/
+__tests__/
+__snapshots__/
+
+# Optional: ignore coverage reports
+coverage/
+
+# Optional: ignore IDE settings
+.idea/
+
+# Optional: ignore build cache
+.cache/

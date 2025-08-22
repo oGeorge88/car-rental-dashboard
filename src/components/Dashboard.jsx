@@ -167,32 +167,36 @@ const Dashboard = () => {
 
   return (
     <>
-      <Container style={{ marginTop: '130px' }}>
-        {/* Admin Calculations Section - always show at top */}
+      <Container style={{ marginTop: '120px', marginBottom: '60px' }}>
+        <h2 className="text-center mb-5" style={{ color: '#218838', fontWeight: '700', letterSpacing: '1px' }}>Car Analytics Dashboard</h2>
+
+        {/* Admin Calculations Section */}
         <Row className="mb-4">
           <Col md={6}>
-            <Card className="shadow-sm p-3 mb-2 bg-white rounded">
+            <Card className="shadow-sm p-4 mb-2 bg-white border-0 rounded-4">
               <Card.Body>
-                <Card.Title>Total Inventory Value</Card.Title>
-                <Card.Text style={{ fontSize: '1.5rem', color: '#1e2a38' }}>
+                <Card.Title style={{ color: '#218838', fontWeight: '600' }}>Total Inventory Value</Card.Title>
+                <Card.Text style={{ fontSize: '1.6rem', color: '#1e2a38', fontWeight: '700' }}>
                   {isNaN(inventoryValue) ? '0' : inventoryValue.toLocaleString()} THB
                 </Card.Text>
               </Card.Body>
             </Card>
           </Col>
           <Col md={6}>
-            <Card className="shadow-sm p-3 mb-2 bg-white rounded">
+            <Card className="shadow-sm p-4 mb-2 bg-white border-0 rounded-4">
               <Card.Body>
-                <Card.Title>Total Revenue</Card.Title>
-                <Card.Text style={{ fontSize: '1.5rem', color: '#28a745' }}>
+                <Card.Title style={{ color: '#218838', fontWeight: '600' }}>Total Revenue</Card.Title>
+                <Card.Text style={{ fontSize: '1.6rem', color: '#28a745', fontWeight: '700' }}>
                   {isNaN(totalRevenue) ? '0' : totalRevenue.toLocaleString()} THB
                 </Card.Text>
-                <Button variant="outline-success" size="sm" onClick={handleAddMockTransaction}>
-                  Add Demo Transaction
-                </Button>{' '}
-                <Button variant="outline-danger" size="sm" onClick={handleClearTransactions}>
-                  Clear All Transactions
-                </Button>
+                <div className="d-flex gap-2 flex-wrap">
+                  <Button variant="outline-success" size="sm" onClick={handleAddMockTransaction} style={{ fontWeight: '500' }}>
+                    Add Demo Transaction
+                  </Button>
+                  <Button variant="outline-danger" size="sm" onClick={handleClearTransactions} style={{ fontWeight: '500' }}>
+                    Clear All Transactions
+                  </Button>
+                </div>
                 {showAlert && <Alert variant="success" className="mt-2 py-1">Demo transaction added!</Alert>}
               </Card.Body>
             </Card>
@@ -202,9 +206,9 @@ const Dashboard = () => {
         {/* Transaction Table */}
         <Row className="mb-4">
           <Col md={12}>
-            <Card className="shadow-sm p-3 mb-2 bg-white rounded">
+            <Card className="shadow-sm p-4 mb-2 bg-white border-0 rounded-4">
               <Card.Body>
-                <Card.Title>Transaction History</Card.Title>
+                <Card.Title style={{ color: '#218838', fontWeight: '600' }}>Transaction History</Card.Title>
                 {transactions.length === 0 ? (
                   <div className="text-muted">No transactions yet.</div>
                 ) : (
@@ -238,15 +242,13 @@ const Dashboard = () => {
           </Col>
         </Row>
 
-        <h2 className="text-center" style={{ color: '#023047', fontWeight: 'bold' }}>Car Analytics Dashboard</h2>
-
         <div className="d-flex justify-content-center my-4">
           <FilterSearch onFilter={handleFilter} />
         </div>
 
         {/* Sort Buttons */}
-        <Form.Group controlId="sortSelect" className="mt-3 d-flex align-items-center justify-content-center">
-          <Form.Label className="me-2" style={{ fontWeight: 'bold', color: '#023047' }}>Sort By:</Form.Label>
+        <Form.Group controlId="sortSelect" className="mt-3 d-flex align-items-center justify-content-center gap-2">
+          <Form.Label className="me-2" style={{ fontWeight: 'bold', color: '#218838' }}>Sort By:</Form.Label>
           <Button
             variant="link"
             onClick={() => handleSortChange('name')}
@@ -286,11 +288,11 @@ const Dashboard = () => {
             currentItems.map((car) => (
               <Col sm={12} md={6} lg={4} key={car.Cid} className="d-flex align-items-stretch">
                 <Card
-                  className="w-100 shadow-lg rounded-3 hover-card"
+                  className="w-100 shadow-lg rounded-4 hover-card"
                   style={{
                     borderColor: car.highlighted ? '#de1a52' : '#ffffff',
                     overflow: 'hidden',
-                    borderRadius: '15px',
+                    borderRadius: '18px',
                     backgroundImage: `linear-gradient(135deg, #f5f7fa 0%, ${car.highlighted ? '#ffdde1' : '#ffffff'} 100%)`,
                     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                     transform: car.highlighted ? 'scale(1.05)' : 'scale(1)',
@@ -299,37 +301,38 @@ const Dashboard = () => {
                   <Link to={`/car/${car.Cid}`}>
                     <Card.Img
                       variant="top"
-                      src={car.Img300} // Adjust based on your image field
-                      alt={car.NameMMT}
+                      src={car.Img300}
+                      alt={`Image of ${car.NameMMT}`}
                       style={{
                         maxHeight: '200px',
                         objectFit: 'cover',
-                        borderTopLeftRadius: '15px',
-                        borderTopRightRadius: '15px',
+                        borderTopLeftRadius: '18px',
+                        borderTopRightRadius: '18px',
+                        background: '#f8f9fa'
                       }}
                     />
                   </Link>
 
                   <Card.Body
                     className="d-flex flex-column"
-                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: '20px' }}
+                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: '22px' }}
                   >
                     <Card.Title
                       className="text-center"
                       style={{
-                        color: '#023047',
+                        color: '#218838',
                         fontWeight: 'bold',
-                        fontSize: '1.5rem',
-                        textShadow: '1px 1px 2px rgba(0, 0, 0, 0.1)',
-                        marginBottom: '15px',
+                        fontSize: '1.45rem',
+                        textShadow: '1px 1px 2px rgba(0, 0, 0, 0.07)',
+                        marginBottom: '12px',
                       }}
                     >
                       <Link
                         to={`/car/${car.Cid}`}
                         className="text-decoration-none"
-                        style={{ color: '#023047', transition: 'color 0.3s ease' }}
-                        onMouseEnter={(e) => (e.target.style.color = '#28a745')}
-                        onMouseLeave={(e) => (e.target.style.color = '#023047')}
+                        style={{ color: '#218838', transition: 'color 0.3s ease' }}
+                        onMouseEnter={(e) => (e.target.style.color = '#de1a52')}
+                        onMouseLeave={(e) => (e.target.style.color = '#218838')}
                       >
                         {car.NameMMT}
                       </Link>
@@ -338,8 +341,8 @@ const Dashboard = () => {
                       className="text-center"
                       style={{
                         color: '#666',
-                        fontSize: '20px',
-                        minHeight: '60px',
+                        fontSize: '1.1rem',
+                        minHeight: '48px',
                       }}
                     >
                       {car.Model} - {car.Yr}
@@ -348,9 +351,9 @@ const Dashboard = () => {
                       className="text-center"
                       style={{
                         color: '#28a745',
-                        fontSize: '1.3rem',
+                        fontSize: '1.2rem',
                         fontWeight: 'bold',
-                        marginBottom: '20px',
+                        marginBottom: '18px',
                       }}
                     >
                       {car.Prc} THB
@@ -364,6 +367,7 @@ const Dashboard = () => {
                           backgroundColor: car.highlighted ? '#de1a52' : 'transparent',
                           borderColor: car.highlighted ? '#de1a52' : '#28a745',
                           color: car.highlighted ? '#ffffff' : '#28a745',
+                          fontWeight: '500',
                           transition: 'background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease',
                         }}
                       >
@@ -375,7 +379,7 @@ const Dashboard = () => {
               </Col>
             ))
           ) : (
-            <p>No data found</p>
+            <p className="text-center text-muted">No cars found.</p>
           )}
         </Row>
 
@@ -399,7 +403,7 @@ const Dashboard = () => {
 
         {isMobile && visibleItems < filteredData.length && (
           <div className="d-flex justify-content-center" style={{ marginTop: '30px' }}>
-            <Button onClick={handleLoadMore} variant="success">
+            <Button onClick={handleLoadMore} variant="success" style={{ fontWeight: '500' }}>
               Load More
             </Button>
           </div>

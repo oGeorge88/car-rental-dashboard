@@ -114,70 +114,73 @@ const BookingCalculator = ({ carPrice, carModel, carName, onConfirm }) => {
   };
 
   return (
-    <div className="mt-4">
-      <Form>
-        <Row>
+    <div className="mt-4 mb-5" style={{ maxWidth: '700px', margin: '0 auto' }}>
+      <h3 className="mb-4 text-center" style={{ color: '#218838', fontWeight: '700', letterSpacing: '1px' }}>Booking Calculator</h3>
+      <Form className="p-4 rounded-4 shadow-sm" style={{ background: '#f8f9fa' }}>
+        <Row className="mb-3">
           <Col md={6}>
-            <Form.Group className="mb-2">
+            <Form.Group>
               <Form.Label>Start Date</Form.Label>
-              <Form.Control type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+              <Form.Control type="date" value={startDate} onChange={e => setStartDate(e.target.value)} aria-label="Start Date" />
             </Form.Group>
           </Col>
           <Col md={6}>
-            <Form.Group className="mb-2">
+            <Form.Group>
               <Form.Label>End Date</Form.Label>
-              <Form.Control type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+              <Form.Control type="date" value={endDate} onChange={e => setEndDate(e.target.value)} aria-label="End Date" />
             </Form.Group>
           </Col>
         </Row>
-        <Form.Group className="mb-2">
-          <Form.Check type="checkbox" label={`Add Insurance (${INSURANCE_DAILY_RATE} THB/day)`} checked={insurance} onChange={e => setInsurance(e.target.checked)} />
+        <Form.Group className="mb-3">
+          <Form.Check type="checkbox" label={`Add Insurance (${INSURANCE_DAILY_RATE} THB/day)`} checked={insurance} onChange={e => setInsurance(e.target.checked)} aria-label="Add Insurance" />
         </Form.Group>
-        <Row>
+        <Row className="mb-3">
           <Col md={4}>
-            <Form.Group className="mb-2">
+            <Form.Group>
               <Form.Label>Distance (km)</Form.Label>
-              <Form.Control type="number" value={distance} onChange={e => setDistance(e.target.value)} placeholder="e.g. 100" />
+              <Form.Control type="number" value={distance} onChange={e => setDistance(e.target.value)} placeholder="e.g. 100" aria-label="Distance in kilometers" />
             </Form.Group>
           </Col>
           <Col md={4}>
-            <Form.Group className="mb-2">
+            <Form.Group>
               <Form.Label>Fuel Efficiency (km/l)</Form.Label>
-              <Form.Control type="number" value={fuelEfficiency} onChange={e => setFuelEfficiency(e.target.value)} placeholder="e.g. 12" />
+              <Form.Control type="number" value={fuelEfficiency} onChange={e => setFuelEfficiency(e.target.value)} placeholder="e.g. 12" aria-label="Fuel Efficiency" />
             </Form.Group>
           </Col>
           <Col md={4}>
-            <Form.Group className="mb-2">
+            <Form.Group>
               <Form.Label>Fuel Price (THB/l)</Form.Label>
-              <Form.Control type="number" value={fuelPrice} onChange={e => setFuelPrice(e.target.value)} placeholder="e.g. 38" />
+              <Form.Control type="number" value={fuelPrice} onChange={e => setFuelPrice(e.target.value)} placeholder="e.g. 38" aria-label="Fuel Price" />
             </Form.Group>
           </Col>
         </Row>
-        <Form.Group className="mb-2">
-          <Form.Label>Actual Return Date (for late fee, optional)</Form.Label>
-          <Form.Control type="date" value={actualReturnDate} onChange={e => setActualReturnDate(e.target.value)} />
+        <Form.Group className="mb-3">
+          <Form.Label>Actual Return Date <span style={{ color: '#888', fontSize: '0.95em' }}>(for late fee, optional)</span></Form.Label>
+          <Form.Control type="date" value={actualReturnDate} onChange={e => setActualReturnDate(e.target.value)} aria-label="Actual Return Date" />
         </Form.Group>
-        <Button variant="success" className="me-2" onClick={handleCalculate}>Calculate Cost</Button>
-        <Button variant="primary" onClick={handleConfirm}>Confirm Booking</Button>
+        <div className="d-flex justify-content-center gap-3 mt-3">
+          <Button variant="success" onClick={handleCalculate} aria-label="Calculate Booking Cost" style={{ minWidth: '140px', fontWeight: '500' }}>Calculate Cost</Button>
+          <Button variant="primary" onClick={handleConfirm} aria-label="Confirm Booking" style={{ minWidth: '140px', fontWeight: '500' }}>Confirm Booking</Button>
+        </div>
       </Form>
       {breakdown && (
-        <Alert variant="success" className="mt-3">
-          <div><strong>Cost Breakdown:</strong></div>
-          <ul style={{ marginBottom: 0 }}>
-            <li>Rental Days: {breakdown.days}</li>
-            <li>Daily Rate: {breakdown.dailyRate.toLocaleString()} THB</li>
-            <li>Base Rental: {breakdown.baseRental.toLocaleString()} THB</li>
-            {breakdown.discount > 0 && <li>Discount: -{breakdown.discount.toLocaleString()} THB</li>}
-            {breakdown.insuranceCost > 0 && <li>Insurance: {breakdown.insuranceCost.toLocaleString()} THB</li>}
-            {breakdown.fuelCost > 0 && <li>Fuel Cost: {breakdown.fuelCost.toLocaleString(undefined, { maximumFractionDigits: 0 })} THB</li>}
-            {breakdown.lateDays > 0 && <li>Late Fee: {breakdown.lateFee.toLocaleString()} THB ({breakdown.lateDays} days late)</li>}
-            <li><strong>Total: {breakdown.total.toLocaleString()} THB</strong></li>
+        <Alert variant="success" className="mt-4 p-3 rounded-4 shadow-sm">
+          <div className="mb-2" style={{ fontWeight: '600', color: '#218838' }}>Cost Breakdown</div>
+          <ul style={{ marginBottom: 0, fontSize: '1.05rem', color: '#444' }}>
+            <li>Rental Days: <strong>{breakdown.days}</strong></li>
+            <li>Daily Rate: <strong>{breakdown.dailyRate.toLocaleString()} THB</strong></li>
+            <li>Base Rental: <strong>{breakdown.baseRental.toLocaleString()} THB</strong></li>
+            {breakdown.discount > 0 && <li>Discount: <span style={{ color: '#d63384' }}>-{breakdown.discount.toLocaleString()} THB</span></li>}
+            {breakdown.insuranceCost > 0 && <li>Insurance: <span style={{ color: '#0d6efd' }}>{breakdown.insuranceCost.toLocaleString()} THB</span></li>}
+            {breakdown.fuelCost > 0 && <li>Fuel Cost: <span style={{ color: '#fd7e14' }}>{breakdown.fuelCost.toLocaleString(undefined, { maximumFractionDigits: 0 })} THB</span></li>}
+            {breakdown.lateDays > 0 && <li>Late Fee: <span style={{ color: '#dc3545' }}>{breakdown.lateFee.toLocaleString()} THB</span> ({breakdown.lateDays} days late)</li>}
+            <li style={{ fontWeight: '700', color: '#218838' }}>Total: {breakdown.total.toLocaleString()} THB</li>
           </ul>
         </Alert>
       )}
-      {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
+      {error && <Alert variant="danger" className="mt-4 p-3 rounded-4 shadow-sm">{error}</Alert>}
       {confirmationMsg && (
-        <Alert variant="info" className="mt-3" style={{ whiteSpace: 'pre-line' }}>
+        <Alert variant="info" className="mt-4 p-3 rounded-4 shadow-sm text-center" style={{ whiteSpace: 'pre-line', fontSize: '1.1rem', fontWeight: '500' }}>
           {confirmationMsg}
         </Alert>
       )}
